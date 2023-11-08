@@ -1,6 +1,6 @@
 // To parse this JSON data, do
 //
-//     final aman = amanFromJson(jsonString);
+// final aman = amanFromJson(jsonString);
 
 import 'dart:convert';
 
@@ -19,6 +19,9 @@ class Aman {
   int value;
   double totalValue;
   String cashierUrl;
+  String cancelUrl;
+  int orderReference;
+  
   List<AvailablePaymentMethod> availablePaymentMethods;
 
   Aman({
@@ -32,6 +35,8 @@ class Aman {
     required this.value,
     required this.totalValue,
     required this.cashierUrl,
+    required this.orderReference,
+    required this.cancelUrl,
     required this.availablePaymentMethods,
   });
 
@@ -46,6 +51,8 @@ class Aman {
         value: json["value"],
         totalValue: json["totalValue"]?.toDouble(),
         cashierUrl: json["cashierUrl"],
+        orderReference: json["orderReference"],
+        cancelUrl: json["cancelUrl"],
         availablePaymentMethods: List<AvailablePaymentMethod>.from(
             json["availablePaymentMethods"]
                 .map((x) => AvailablePaymentMethod.fromJson(x))),
@@ -62,6 +69,8 @@ class Aman {
         "value": value,
         "totalValue": totalValue,
         "cashierUrl": cashierUrl,
+        "orderReference" : orderReference,
+        "cancelUrl" : cancelUrl,
         "availablePaymentMethods":
             List<dynamic>.from(availablePaymentMethods.map((x) => x.toJson())),
       };
