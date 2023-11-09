@@ -20,6 +20,8 @@ class Aman {
   double totalValue;
   String cashierUrl;
   String cancelUrl;
+  String callbackUrl;
+  String returnUrl;
   int orderReference;
   
   List<AvailablePaymentMethod> availablePaymentMethods;
@@ -37,6 +39,8 @@ class Aman {
     required this.cashierUrl,
     required this.orderReference,
     required this.cancelUrl,
+    required this.callbackUrl,
+    required this.returnUrl,
     required this.availablePaymentMethods,
   });
 
@@ -52,7 +56,9 @@ class Aman {
         totalValue: json["totalValue"]?.toDouble(),
         cashierUrl: json["cashierUrl"],
         orderReference: json["orderReference"],
-        cancelUrl: json["cancelUrl"],
+        cancelUrl:  "https://www.facebook.com/",
+        callbackUrl: "https://www.google.com/",
+        returnUrl: "https://www.youtube.com/",
         availablePaymentMethods: List<AvailablePaymentMethod>.from(
             json["availablePaymentMethods"]
                 .map((x) => AvailablePaymentMethod.fromJson(x))),
@@ -71,6 +77,8 @@ class Aman {
         "cashierUrl": cashierUrl,
         "orderReference" : orderReference,
         "cancelUrl" : cancelUrl,
+        "callbackUrl" : callbackUrl,
+        "returnUrl" : returnUrl,
         "availablePaymentMethods":
             List<dynamic>.from(availablePaymentMethods.map((x) => x.toJson())),
       };

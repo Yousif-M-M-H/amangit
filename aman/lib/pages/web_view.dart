@@ -1,53 +1,81 @@
+// hello bard, i'm yousif what's wrong here when i reach youtube no snackbar is displayed in the screen
+
+
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:http/http.dart' as http;
 
 class WebViewContainer extends StatefulWidget {
   final String cashierUrl;
-  const WebViewContainer({Key? key, required this.cashierUrl}) : super(key: key);
+  final String cancelUrl;
+  final String callbackUrl;
+  final String returnUrl;
+
+  const WebViewContainer(
+      {Key? key,
+      required this.cashierUrl,
+      required this.cancelUrl,
+      required this.callbackUrl,
+      required this.returnUrl})
+      : super(key: key);
 
   @override
   State<WebViewContainer> createState() => _WebViewContainerState();
 }
 
 class _WebViewContainerState extends State<WebViewContainer> {
-  late WebViewController _webViewController;
-
-Future<bool> _onBackPressed() async {
-  final result = await showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text("Do you really want to exit the payment page"),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context, false), child:const Text("No")),
-        TextButton(onPressed: () => Navigator.pop(context, true), child:const Text("Yes")),
-      ],
-    ),
-  );
-
-  return result;
-}
-
+  late final WebViewController controller;
 
   @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onBackPressed,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Web view'),
-        ),
-        body: WebViewWidget(
-          controller: WebViewController()
-          ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..loadRequest(
-            Uri.parse('http://aman-checkout.mimocodes.com/${widget.cashierUrl}'),
-          ),
+  void initState() {
+    super.initState();
+    controller = WebViewController()
+      ..enableZoom(false)
+      ..setNavigationDelegate(
+        
+        NavigationDelegate(
+        onPageStarted: (url) {
           
-        ),
+        },        
+        onNavigationRequest: (request) {
+          if (request.url.startsWith(widget.returnUrl)) {
+            
+            return NavigationDecision.prevent;
+          }
+          return NavigationDecision.navigate;
+        },
+      ))
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(
+        Uri.parse('https://google.com/'),
+      );
+  }
+// http://aman-checkout.mimocodes.com/${widget.cashierUrl}
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Web view'),
       ),
+      body: WebViewWidget(
+        controller:   WebViewController()
+      ..enableZoom(false)
+      ..setNavigationDelegate(NavigationDelegate(
+        onNavigationRequest: (request) {
+          if (request.url.startsWith(widget.returnUrl)) {
+            print("Hello");
+            return NavigationDecision.prevent;
+          }
+          return NavigationDecision.navigate;
+        },
+      ))
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(
+        Uri.parse('https://google.com/'),
+      )
+      )
     );
   }
-
-
 }
+
+
+
