@@ -1,5 +1,3 @@
-// hello bard, i'm yousif what's wrong here when i reach youtube no snackbar is displayed in the screen
-
 
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -24,58 +22,42 @@ class WebViewContainer extends StatefulWidget {
 
 class _WebViewContainerState extends State<WebViewContainer> {
   late final WebViewController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = WebViewController()
-      ..enableZoom(false)
-      ..setNavigationDelegate(
-        
-        NavigationDelegate(
-        onPageStarted: (url) {
-          
-        },        
-        onNavigationRequest: (request) {
-          if (request.url.startsWith(widget.returnUrl)) {
-            
-            return NavigationDecision.prevent;
-          }
-          return NavigationDecision.navigate;
-        },
-      ))
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(
-        Uri.parse('https://google.com/'),
-      );
-  }
-// http://aman-checkout.mimocodes.com/${widget.cashierUrl}
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Web view'),
+       leading: IconButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        icon: Icon(
+          Icons.arrow_back,
+          color: Theme.of(context).primaryColorDark,
+        )),
       ),
       body: WebViewWidget(
-        controller:   WebViewController()
-      ..enableZoom(false)
-      ..setNavigationDelegate(NavigationDelegate(
-        onNavigationRequest: (request) {
-          if (request.url.startsWith(widget.returnUrl)) {
-            print("Hello");
-            return NavigationDecision.prevent;
-          }
-          return NavigationDecision.navigate;
-        },
-      ))
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(
-        Uri.parse('https://google.com/'),
-      )
-      )
+      controller: WebViewController()
+        ..enableZoom(false)
+        ..setNavigationDelegate(NavigationDelegate(
+          onNavigationRequest: (request) {
+            if (request.url ==
+                "http://aman-checkout.mimocodes.com/${widget.cashierUrl}/payment-method") {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text("Hello to flutter install")));
+              return NavigationDecision.prevent;
+            }
+
+            return NavigationDecision.navigate;
+          },
+        ))
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..loadRequest(
+          Uri.parse('http://aman-checkout.mimocodes.com/${widget.cashierUrl}'),
+        ))
     );
   }
 }
 
-
-
+// http://aman-checkout.mimocodes.com/${widget.cashierUrl}
+//aman-checkout.mimocodes.com/14505055ab0cc78c90ba7de6fc34f84f14ea5aa3f090781c34/reference-code-2
