@@ -1,12 +1,4 @@
-// To parse this JSON data, do
-//
-// final aman = amanFromJson(jsonString);
-
 import 'dart:convert';
-
-Aman amanFromJson(String str) => Aman.fromJson(json.decode(str));
-
-String amanToJson(Aman data) => json.encode(data.toJson());
 
 class Aman {
   int reference;
@@ -21,11 +13,9 @@ class Aman {
   String cashierUrl;
   String cancelUrl;
   String callbackUrl;
-  String returnUrl;
+  late String returnUrl;
   int orderReference;
-  
   List<AvailablePaymentMethod> availablePaymentMethods;
-
   Aman({
     required this.reference,
     required this.amount,
@@ -40,9 +30,11 @@ class Aman {
     required this.orderReference,
     required this.cancelUrl,
     required this.callbackUrl,
-    required this.returnUrl,
     required this.availablePaymentMethods,
-  });
+  }) {
+    final expectedBaseUrl = "http://aman-checkout.mimocodes.com/$cashierUrl";
+    returnUrl = "$expectedBaseUrl/reference-code-2";
+  }
 
   factory Aman.fromJson(Map<String, dynamic> json) => Aman(
         reference: json["reference"],
@@ -56,9 +48,8 @@ class Aman {
         totalValue: json["totalValue"]?.toDouble(),
         cashierUrl: json["cashierUrl"],
         orderReference: json["orderReference"],
-        cancelUrl:  "https://www.facebook.com/",
-        callbackUrl: "https://www.google.com/",
-        returnUrl: "https://www.youtube.com/",
+        cancelUrl: "https://www.facebook.com/",
+        callbackUrl: "https://www.nhi.com/",
         availablePaymentMethods: List<AvailablePaymentMethod>.from(
             json["availablePaymentMethods"]
                 .map((x) => AvailablePaymentMethod.fromJson(x))),
@@ -75,10 +66,10 @@ class Aman {
         "value": value,
         "totalValue": totalValue,
         "cashierUrl": cashierUrl,
-        "orderReference" : orderReference,
-        "cancelUrl" : cancelUrl,
-        "callbackUrl" : callbackUrl,
-        "returnUrl" : returnUrl,
+        "orderReference": orderReference,
+        "cancelUrl": cancelUrl,
+        "callbackUrl": callbackUrl,
+        "returnUrl": returnUrl,
         "availablePaymentMethods":
             List<dynamic>.from(availablePaymentMethods.map((x) => x.toJson())),
       };

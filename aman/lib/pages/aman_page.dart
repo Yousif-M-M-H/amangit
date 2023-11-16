@@ -24,7 +24,6 @@ class _AmanPageState extends State<AmanPage> {
 
   Future<Aman> submitData(int amount, String currency, int orderReference) async {
     var headers = {
-
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       'publicKey': 'AMANPUB6634801781243253.4080687977011781',
