@@ -1,4 +1,4 @@
-import 'package:aman/pages/aman_page.dart';
+import 'package:aman/pages/home_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true),
-      home:  AmanPage(),
+      home:  const HomePage(),
     );
   }
 }

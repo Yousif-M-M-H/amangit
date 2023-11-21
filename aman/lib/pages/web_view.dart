@@ -1,5 +1,5 @@
-import 'package:aman/pages/aman_page.dart';
 import 'package:aman/pages/paymentDone.dart';
+import 'package:amanpack/amanpack.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -29,71 +29,85 @@ class _WebViewContainerState extends State<WebViewContainer> {
 
   @override
   Widget build(BuildContext context) {
-    print('this is the reutrn url------------->' + widget.returnUrl);
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Web view'),
-          leading: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: Icon(
-                Icons.arrow_back,
-                color: Theme.of(context).primaryColorDark,
-              )),
-        ),
-        body: WebViewWidget(
-            controller: WebViewController()
-              ..enableZoom(false)
-              ..setNavigationDelegate(NavigationDelegate(
-                onPageFinished: (String url) {
-                  final expectedBaseUrl =
-                      "http://aman-checkout.mimocodes.com/${widget.cashierUrl}";
-                  final expectedPaymentMethodUrl =
-                      "$expectedBaseUrl/payment-method";
-                  if (url == expectedPaymentMethodUrl) {
-                    logger.d("you reached to refrence");
-                    if (url.contains("/reference-code-2")) {
-                      logger.d("Navigating to payment method done!");
-                      Future.delayed(const Duration(seconds: 3), () {
-                        _navigateToPaymentDone(context);
-                      });
-                    }
-                  }
+    logger.e('this is the reutrn url------------->' + widget.returnUrl);
+    return WillPopScope(
+      onWillPop: ()async {
+        print("object");
+        var isLastPage = await controller.canGoBack();
+        if (isLastPage) {
+          controller.goBack();
+          return false;
+        }
+          return true;
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Web view'),
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
                 },
-                onUrlChange: (change) {
-                  if (change.url != null) {
-                    if (change.url!.startsWith(widget.returnUrl)) {
-                      logger.d('Navigating to refrence code page is happend perfectly in the on change url');
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Theme.of(context).primaryColorDark,
+                )),
+          ),
+          
+          body: WebViewWidget(
+            
+              controller: WebViewController()
+                ..enableZoom(false)
+                ..setNavigationDelegate(NavigationDelegate(
+                  onPageFinished: (String url) {
+                    final expectedBaseUrl =
+                        "http://aman-checkout.mimocodes.com/${widget.cashierUrl}";
+                    final expectedPaymentMethodUrl =
+                        "$expectedBaseUrl/payment-method";
+                    if (url == expectedPaymentMethodUrl) {
+                      logger.d("you reached to refrence");
+                      if (url.contains("/reference-code-2")) {
+                        logger.d("Navigating to payment method done!");
+                        Future.delayed(const Duration(seconds: 3), () {
+                          _navigateToPaymentDone(context);
+                        });
+                      }
+                    }
+                  },
+                  onUrlChange: (change) {
+                    if (change.url != null) {
+                      if (change.url!.startsWith(widget.returnUrl)) {
+                        logger.d(
+                            'Navigating to refrence code page is happend perfectly in the on change url');
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            content: Text('navigating to the app in 5 second')));
+                        Future.delayed(const Duration(seconds: 10), () {
+                          _navigateToPaymentDone(context);
+                        });
+                      }
+                    }
+                  },
+                  onNavigationRequest: (NavigationRequest request) {
+                    if (request.url != null &&
+                        request.url.startsWith(widget.returnUrl)) {
+                      logger.d(
+                          'Prevented navigation to the return URL in onNavigationRequest');
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           content: Text('navigating to the app in 5 second')));
                       Future.delayed(const Duration(seconds: 3), () {
                         _navigateToPaymentDone(context);
                       });
+                      return NavigationDecision.prevent;
                     }
-                  }
-                },
-                onNavigationRequest: (NavigationRequest request) {
-                  if (request.url != null &&
-                      request.url.startsWith(widget.returnUrl)) {
-                    logger.d(
-                        'Prevented navigation to the return URL in onNavigationRequest');
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('navigating to the app in 5 second')));
-                    Future.delayed(const Duration(seconds: 3), () {
-                      _navigateToPaymentDone(context);
-                    });
-                    return NavigationDecision.prevent;
-                  }
-
-                  return NavigationDecision.navigate;
-                },
-              ))
-              ..setJavaScriptMode(JavaScriptMode.unrestricted)
-              ..loadRequest(
-                Uri.parse(
-                    'http://aman-checkout.mimocodes.com/${widget.cashierUrl}'),
-              )));
+    
+                    return NavigationDecision.navigate;
+                  },
+                ))
+                ..setJavaScriptMode(JavaScriptMode.unrestricted)
+                ..loadRequest(
+                  Uri.parse(
+                      'http://aman-checkout.mimocodes.com/${widget.cashierUrl}'),
+                ))),
+    );
   }
 }
 

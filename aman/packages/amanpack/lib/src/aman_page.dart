@@ -1,14 +1,10 @@
-
-
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:aman/models/aman_model.dart';
-import 'package:aman/pages/web_view.dart';
-import 'package:flutter/services.dart';
-import 'package:http/http.dart' as https;
+part of amanpack;
 
 class AmanPage extends StatefulWidget {
-  const AmanPage({super.key});
+  const AmanPage({Key? key, required this.onPaymentSuccess});
+
+  final Function(String cashierUrl, String cancelUrl, String callbackUrl, String returnUrl) onPaymentSuccess;
+
   @override
   _AmanPageState createState() => _AmanPageState();
 }
@@ -17,12 +13,17 @@ class _AmanPageState extends State<AmanPage> {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController currencyController = TextEditingController();
   final TextEditingController orderReferenceController = TextEditingController();
+
   String? myCashierUrl = '';
-  String? cancelUrl = ''; 
+  String? cancelUrl = '';
   String? callbackUrl = '';
   String? returnUrl = '';
 
-  Future<Aman> submitData(int amount, String currency, int orderReference) async {
+  Future<Aman> submitData(
+    int amount,
+    String currency,
+    int orderReference,
+  ) async {
     var headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -41,13 +42,15 @@ class _AmanPageState extends State<AmanPage> {
         headers: headers,
       );
       var responseBody = response.body;
-        print(responseBody);
+      print(responseBody);
       if (response.statusCode == 201) {
-      Aman amanData = Aman.fromJson(json.decode(responseBody));
+        Aman amanData = Aman.fromJson(json.decode(responseBody));
         myCashierUrl = amanData.cashierUrl;
-        cancelUrl = amanData.cancelUrl; 
+        cancelUrl = amanData.cancelUrl;
         callbackUrl = amanData.callbackUrl;
         returnUrl = amanData.returnUrl;
+
+        widget.onPaymentSuccess(myCashierUrl!, cancelUrl!, callbackUrl!, returnUrl!);
 
         return amanData;
       } else {
@@ -63,7 +66,6 @@ class _AmanPageState extends State<AmanPage> {
 
   @override
   Widget build(BuildContext context) {
-    Aman _aman;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Aman Data Form'),
@@ -112,6 +114,7 @@ class _AmanPageState extends State<AmanPage> {
                     return null;
                   },
                 ),
+             
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
@@ -122,25 +125,6 @@ class _AmanPageState extends State<AmanPage> {
                           amount,
                           currencyController.text,
                           int.parse(orderReferenceController.text),
-                        );
-
-                        setState(() {
-                          _aman = data;
-                        });
-
-                        print('${callbackUrl} , ${cancelUrl} , ${returnUrl}');
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => WebViewContainer(
-                              cashierUrl: myCashierUrl!,
-                              cancelUrl: cancelUrl!, 
-                              callbackUrl: callbackUrl!,
-                              returnUrl: returnUrl!,
-                              
-                            ),
-                          ),
                         );
                       } catch (e) {
                         print("Error: $e");

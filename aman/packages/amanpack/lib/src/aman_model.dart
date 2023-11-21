@@ -1,4 +1,5 @@
-import 'dart:convert';
+part of amanpack;
+
 
 class Aman {
   int reference;
@@ -99,3 +100,4 @@ class AvailablePaymentMethod {
         "code": code,
       };
 }
+
